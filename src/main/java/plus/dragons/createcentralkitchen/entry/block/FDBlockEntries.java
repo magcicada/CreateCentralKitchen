@@ -47,7 +47,22 @@ public class FDBlockEntries {
     public static BlockItem APPLE_PIE_ITEM;
     public static BlockItem MULBERRY_PIE_ITEM;
 
-    private static BlockBuilder<PieBlock, CreateRegistrate> pie(String name, NonNullSupplier<Item> slice) {
+    private static class ApplePieItem extends ItemNameBlockItem {
+        public ApplePieItem(Block block, Properties properties) {
+            super(block, properties);
+        }
+        @Override
+        @ParametersAreNonnullByDefault
+        public void registerBlocks(Map<Block, Item> blockToItemMap, Item item) {}
+        @Override
+        @ParametersAreNonnullByDefault
+        public void removeFromBlockToItemMap(Map<Block, Item> blockToItemMap, Item item) {}
+    }
+
+    private static BlockBuilder<PieBlock, CreateRegistrate> pie(
+        String name,
+        NonNullSupplier<Item> slice
+    ) {
         return REGISTRATE
                 .block(name, prop -> new PieBlock(prop, slice))
                 .initialProperties(() -> Blocks.CAKE);
@@ -76,18 +91,13 @@ public class FDBlockEntries {
 
         ResourceLocation apple_pie = Mods.environmental("apple_pie");
         if (isPieOverhaulEnabled(apple_pie) && Mods.isLoaded(Mods.ENVIRONMENTAL)) {
-            //Need to override BlockItem#registerBlocks and BlockItem#removeFromBlockToItemMap
-            //So Farmer's Delight's apple pie won't get overridden
-            APPLE_PIE_ITEM = new ItemNameBlockItem(ModBlocks.APPLE_PIE.get(),
-                    new Item.Properties()) {
-                @Override
-                @ParametersAreNonnullByDefault
-                public void registerBlocks(Map<Block, Item> blockToItemMap, Item item) {}
-
-                @Override
-                @ParametersAreNonnullByDefault
-                public void removeFromBlockToItemMap(Map<Block, Item> blockToItemMap, Item item) {}
-            };
+            // Need to override BlockItem#registerBlocks
+            // and BlockItem#removeFromBlockToItemMap
+            // So Farmer's Delight's apple pie won't get overridden
+            APPLE_PIE_ITEM = new ApplePieItem (
+                ModBlocks.APPLE_PIE.get(),
+                new Item.Properties()
+            );
             registry.register(apple_pie, APPLE_PIE_ITEM);
         }
 
