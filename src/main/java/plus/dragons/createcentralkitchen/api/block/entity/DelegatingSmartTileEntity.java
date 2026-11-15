@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class DelegatingSmartTileEntity<BE extends BlockEntity> extends SmartBlockEntity {
+    // Forge may query these getters while the superclass is still gathering capabilities.
     protected final BE blockEntity;
 
     public DelegatingSmartTileEntity(BE blockEntity) {
@@ -18,16 +19,16 @@ public abstract class DelegatingSmartTileEntity<BE extends BlockEntity> extends 
     @Nullable
     @Override
     public Level getLevel() {
-        return blockEntity.getLevel();
+        return blockEntity == null ? super.getLevel() : blockEntity.getLevel();
     }
 
     @Override
     public BlockPos getBlockPos() {
-        return blockEntity.getBlockPos();
+        return blockEntity == null ? super.getBlockPos() : blockEntity.getBlockPos();
     }
 
     @Override
     public BlockState getBlockState() {
-        return blockEntity.getBlockState();
+        return blockEntity == null ? super.getBlockState() : blockEntity.getBlockState();
     }
 }
